@@ -101,4 +101,4 @@ df['Fim'] = pd.to_datetime(df['Data'].dt.strftime('%Y-%m-%d') + ' ' + df['Fim'].
 df['Horas_Gastas'] = (df['Fim'] - df['Inicio']).dt.total_seconds() / 60  
 
 # Iniciar a interface
-root.mainloop()
+root.mainloop() 
