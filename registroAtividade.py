@@ -12,19 +12,23 @@ def adicionar_valores_barras(ax):
         ax.annotate(f'{int(horas)}h {int(minutos)}min',
                     (p.get_x() + p.get_width() / 2., p.get_height()),
                     ha='center', va='center', xytext=(0, 10), textcoords='offset points')
-
+        
 # Função para exibir os gráficos
 def exibir_graficos():
     mes = int(entry_mes.get())
     ano = int(entry_ano.get())
     df_filtrado = df[(df['Data'].dt.month == mes) & (df['Data'].dt.year == ano)]
 
+    # Contagem de atividades realizadas no mês
+    gabriel_count = df_filtrado[df_filtrado['Nome'].str.upper() == 'GABRIEL'].shape[0]
+    uilliam_count = df_filtrado[df_filtrado['Nome'].str.upper() == 'UILLIAM'].shape[0]
+
     # Filtrar e somar atividades de Gabriel e Uilliam
     gabriel_atividades = filtrar_por_nome(df_filtrado, 'GABRIEL').groupby('Data')['Horas_Gastas'].sum().reset_index()
     uilliam_atividades = filtrar_por_nome(df_filtrado, 'UILLIAM').groupby('Data')['Horas_Gastas'].sum().reset_index()
 
-    # Gráficos de barras
-    plt.figure(figsize=(14, 8))
+    # Gráficos
+    plt.figure(figsize=(16, 12))
 
     # Gráfico para Gabriel
     plt.subplot(2, 2, 1)
@@ -46,24 +50,36 @@ def exibir_graficos():
     plt.legend(['Uilliam'], loc='upper right')
     adicionar_valores_barras(ax2)
 
-    # Gráfico em pizza por mês
-    plt.subplot(2, 1, 2)
-    gabriel_count = df_filtrado[df_filtrado['Nome'].str.upper() == 'GABRIEL'].shape[0]
-    uilliam_count = df_filtrado[df_filtrado['Nome'].str.upper() == 'UILLIAM'].shape[0]
-    
-    # Definindo os rótulos e valores
+    # Gráfico em pizza por mês (à esquerda)
+    plt.subplot(2, 2, 3)
     labels = ['Gabriel', 'Uilliam']
     sizes = [gabriel_count, uilliam_count]
-    
-    # Criar gráfico em pizza
     plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=140, colors=['blue', 'orange'])
-    plt.title(f'Quantidade de Atividades de Gabriel e Uilliam - {mes}/{ano}')
+    plt.title(f'Quantidade de Atividades por Mês - {mes}/{ano}')
     plt.axis('equal') 
 
-    mng = plt.get_current_fig_manager()
-    mng.window.state('zoomed') 
+    # Gráfico de barras para a quantidade de atividades (à direita)
+    plt.subplot(2, 2, 4)
+    atividades = pd.DataFrame({
+        'Nome': ['Gabriel', 'Uilliam'],
+        'Quantidade': [gabriel_count, uilliam_count]
+    })
+    ax4 = sns.barplot(x='Nome', y='Quantidade', data=atividades, palette=['blue', 'orange'])
+    plt.title(f'Quantidade de Atividades Realizadas - {mes}/{ano}')
+    plt.xlabel('Nome')
+    plt.ylabel('Quantidade de Atividades')
+    for p in ax4.patches:
+        ax4.annotate(f'{int(p.get_height())}',
+                     (p.get_x() + p.get_width() / 2., p.get_height()),
+                     ha='center', va='center', xytext=(0, 10), textcoords='offset points')
 
-    plt.tight_layout()
+    # Ajustar layout
+    plt.tight_layout(h_pad=3, w_pad=3)
+
+    # Maximizar janela
+    mng = plt.get_current_fig_manager()
+    mng.window.state('zoomed')
+
     plt.show()
 
 # Função para filtrar atividades pelo nome
@@ -101,4 +117,4 @@ df['Fim'] = pd.to_datetime(df['Data'].dt.strftime('%Y-%m-%d') + ' ' + df['Fim'].
 df['Horas_Gastas'] = (df['Fim'] - df['Inicio']).dt.total_seconds() / 60  
 
 # Iniciar a interface
-root.mainloop() 
+root.mainloop()
