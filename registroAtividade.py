@@ -23,7 +23,7 @@ def exibir_graficos():
     gabriel_count = df_filtrado[df_filtrado['Nome'].str.upper() == 'GABRIEL'].shape[0]
     uilliam_count = df_filtrado[df_filtrado['Nome'].str.upper() == 'UILLIAM'].shape[0]
 
-    # Filtrar e somar atividades de Gabriel e Uilliam
+ 
     gabriel_atividades = filtrar_por_nome(df_filtrado, 'GABRIEL').groupby('Data')['Horas_Gastas'].sum().reset_index()
     uilliam_atividades = filtrar_por_nome(df_filtrado, 'UILLIAM').groupby('Data')['Horas_Gastas'].sum().reset_index()
 
@@ -73,10 +73,10 @@ def exibir_graficos():
                      (p.get_x() + p.get_width() / 2., p.get_height()),
                      ha='center', va='center', xytext=(0, 10), textcoords='offset points')
 
-    # Ajustar layout
+
     plt.tight_layout(h_pad=3, w_pad=3)
 
-    # Maximizar janela
+ 
     mng = plt.get_current_fig_manager()
     mng.window.state('zoomed')
 
@@ -90,25 +90,24 @@ def filtrar_por_nome(df, nome):
 root = tk.Tk()
 root.title('Dashboard de Atividades')
 
-# Label e campo de entrada para o mês
 label_mes = ttk.Label(root, text="Digite o número do mês (1-12):")
 label_mes.pack(pady=10)
 
 entry_mes = ttk.Entry(root)
 entry_mes.pack(pady=5)
 
-# Label e campo de entrada para o ano
+
 label_ano = ttk.Label(root, text="Digite o ano (ex: 2024):")
 label_ano.pack(pady=10)
 
 entry_ano = ttk.Entry(root)
 entry_ano.pack(pady=5)
 
-# Botão para gerar gráficos
+
 btn_exibir = ttk.Button(root, text="Exibir Gráficos", command=exibir_graficos)
 btn_exibir.pack(pady=20)
 
-# Carregar os dados
+
 df = pd.read_excel('../registro-de-atividades.xlsx', engine='openpyxl', header=1)
 df.columns = df.columns.str.strip()
 df['Data'] = pd.to_datetime(df['Data'], format='%d/%m/%Y', errors='coerce')
@@ -116,5 +115,5 @@ df['Inicio'] = pd.to_datetime(df['Data'].dt.strftime('%Y-%m-%d') + ' ' + df['Ini
 df['Fim'] = pd.to_datetime(df['Data'].dt.strftime('%Y-%m-%d') + ' ' + df['Fim'].astype(str), format='%Y-%m-%d %H:%M:%S', errors='coerce')
 df['Horas_Gastas'] = (df['Fim'] - df['Inicio']).dt.total_seconds() / 60  
 
-# Iniciar a interface
+
 root.mainloop()
